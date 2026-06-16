@@ -1,0 +1,475 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);font-size:14px;color:var(--color-text-primary);background:var(--color-background-tertiary)}
+.app{display:flex;height:100vh;min-height:600px}
+.sidebar{width:200px;flex-shrink:0;background:var(--color-background-primary);border-right:0.5px solid var(--color-border-tertiary);display:flex;flex-direction:column;padding:16px 0}
+.sidebar-logo{padding:0 16px 16px;border-bottom:0.5px solid var(--color-border-tertiary);margin-bottom:8px}
+.sidebar-logo h1{font-size:15px;font-weight:500;color:var(--color-text-primary)}
+.sidebar-logo p{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--color-text-secondary);border-radius:0;transition:background .15s;border-left:2px solid transparent}
+.nav-item:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.nav-item.active{background:var(--color-background-info);color:var(--color-text-info);border-left:2px solid #185FA5}
+.nav-item i{font-size:16px}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.topbar{background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+.topbar h2{font-size:16px;font-weight:500}
+.topbar-actions{display:flex;gap:8px}
+.btn{padding:6px 12px;border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary);border-radius:var(--border-radius-md);cursor:pointer;font-size:12px;display:flex;align-items:center;gap:4px}
+.btn:hover{background:var(--color-background-secondary)}
+.btn-primary{background:#185FA5;color:#fff;border-color:#185FA5}
+.btn-primary:hover{background:#0C447C;border-color:#0C447C}
+.content{padding:16px 20px;flex:1}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.metric-value.green{color:#3B6D11}
+.metric-value.amber{color:#854F0B}
+.metric-value.red{color:#A32D2D}
+.section{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);margin-bottom:16px;overflow:hidden}
+.section-head{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:center;justify-content:space-between}
+.section-head h3{font-size:13px;font-weight:500}
+.filters{display:flex;gap:8px;align-items:center}
+.filters select{font-size:12px;padding:4px 8px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th{padding:8px 10px;text-align:left;font-weight:500;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);white-space:nowrap;font-size:11px;text-transform:uppercase;letter-spacing:.3px}
+.table td{padding:9px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:var(--color-background-secondary)}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.progress-wrap{display:flex;align-items:center;gap:6px}
+.progress{height:6px;background:var(--color-border-tertiary);border-radius:99px;flex:1;overflow:hidden}
+.progress-bar{height:100%;border-radius:99px;background:#185FA5}
+.tabs{display:flex;gap:0;border-bottom:0.5px solid var(--color-border-tertiary);padding:0 16px}
+.tab{padding:8px 14px;font-size:12px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.tab.active{color:#185FA5;border-bottom-color:#185FA5;font-weight:500}
+.tab:hover:not(.active){color:var(--color-text-primary)}
+.fin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px}
+.fin-block{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px}
+.fin-block h4{font-size:12px;color:var(--color-text-secondary);margin-bottom:12px;text-transform:uppercase;letter-spacing:.4px}
+.fin-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:12px}
+.fin-row:last-child{border-bottom:none;font-weight:500;padding-top:8px;margin-top:4px}
+.fin-row span:last-child{font-weight:500}
+.alert-row{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--border-radius-md);background:var(--color-background-secondary);margin:4px 0}
+.alert-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot-amber{background:#EF9F27}
+.dot-red{background:#E24B4A}
+.dot-blue{background:#378ADD}
+.alert-text{font-size:12px;flex:1}
+.alert-date{font-size:11px;color:var(--color-text-secondary)}
+.page{display:none}
+.page.active{display:block}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:500;flex-shrink:0}
+.row-name{display:flex;align-items:center;gap:8px}
+.empty-state{text-align:center;padding:40px;color:var(--color-text-secondary);font-size:13px}
+</style>
+
+<h2 class="sr-only">Plateforme de suivi des alternants — tableau de bord RH avec indicateurs financiers OPCO et SYLAE</h2>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <h1>Alternants</h1>
+      <p>Espace RH</p>
+    </div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Tableau de bord</div>
+    <div class="nav-item" onclick="showPage('alternants',this)"><i class="ti ti-users" aria-hidden="true"></i> Alternants</div>
+    <div class="nav-item" onclick="showPage('finances',this)"><i class="ti ti-coin" aria-hidden="true"></i> Finances</div>
+    <div class="nav-item" onclick="showPage('alertes',this)"><i class="ti ti-bell" aria-hidden="true"></i> Alertes <span style="margin-left:auto;background:#FCEBEB;color:#A32D2D;font-size:10px;padding:1px 6px;border-radius:99px">4</span></div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <h2 id="page-title">Tableau de bord</h2>
+      <div class="topbar-actions">
+        <button class="btn"><i class="ti ti-filter" aria-hidden="true"></i> Filtrer</button>
+        <button class="btn btn-primary" onclick="sendPrompt('Je veux ajouter un nouvel alternant dans la plateforme, quels champs dois-je renseigner ?')"><i class="ti ti-plus" aria-hidden="true"></i> Ajouter ↗</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">Alternants actifs</div>
+            <div class="metric-value">7</div>
+            <div class="metric-sub">Promo 2024–2026</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Budget formation OPCO</div>
+            <div class="metric-value">70 619 €</div>
+            <div class="metric-sub">Total coûts formation</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Prise en charge OPCO</div>
+            <div class="metric-value green">53 305 €</div>
+            <div class="metric-sub">Accordée sur dossiers</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Aides SYLAE restant</div>
+            <div class="metric-value amber">9 333 €</div>
+            <div class="metric-sub">À percevoir</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="section">
+            <div class="section-head"><h3>Répartition par statut</h3></div>
+            <div style="padding:16px">
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Contrats accordés</span><span style="font-weight:500;color:#185FA5">4</span></div>
+                  <div class="progress"><div class="progress-bar" style="width:57%"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>Ruptures anticipées</span><span style="font-weight:500;color:#A32D2D">3</span></div>
+                  <div class="progress"><div class="progress-bar" style="width:43%;background:#E24B4A"></div></div>
+                </div>
+                <div>
+                  <div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span>En cours de montage</span><span style="font-weight:500;color:#854F0B">2</span></div>
+                  <div class="progress"><div class="progress-bar" style="width:29%;background:#EF9F27"></div></div>
+                </div>
+              </div>
+              <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+                <div style="text-align:center;flex:1;background:var(--color-background-secondary);padding:8px;border-radius:var(--border-radius-md)">
+                  <div style="font-size:18px;font-weight:500;color:#185FA5">3</div>
+                  <div style="font-size:10px;color:var(--color-text-secondary)">Sites</div>
+                </div>
+                <div style="text-align:center;flex:1;background:var(--color-background-secondary);padding:8px;border-radius:var(--border-radius-md)">
+                  <div style="font-size:18px;font-weight:500">7</div>
+                  <div style="font-size:10px;color:var(--color-text-secondary)">Écoles</div>
+                </div>
+                <div style="text-align:center;flex:1;background:var(--color-background-secondary);padding:8px;border-radius:var(--border-radius-md)">
+                  <div style="font-size:18px;font-weight:500;color:#EF9F27">43%</div>
+                  <div style="font-size:10px;color:var(--color-text-secondary)">Taux rupture</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h3><i class="ti ti-bell" style="font-size:14px;margin-right:4px" aria-hidden="true"></i>Alertes prioritaires</h3></div>
+            <div style="padding:10px 12px">
+              <div class="alert-row"><div class="alert-dot dot-red"></div><div class="alert-text">CERFA manquant — uu yy (FOZ)</div><div class="alert-date">Contrat sept. 2026</div></div>
+              <div class="alert-row"><div class="alert-dot dot-red"></div><div class="alert-text">Convention non signée — ff bb (CE)</div><div class="alert-date">Contrat sept. 2026</div></div>
+              <div class="alert-row"><div class="alert-dot dot-amber"></div><div class="alert-text">SYLAE : 2 667 € restants — aa zz</div><div class="alert-date">À percevoir</div></div>
+              <div class="alert-row"><div class="alert-dot dot-amber"></div><div class="alert-text">SYLAE : 4 167 € restants — ii oo</div><div class="alert-date">À percevoir</div></div>
+              <div class="alert-row"><div class="alert-dot dot-blue"></div><div class="alert-text">Reste à charge formation — vv uu</div><div class="alert-date">750 € non réglés</div></div>
+              <div style="margin-top:8px"><button class="btn" style="font-size:11px;width:100%;justify-content:center" onclick="showPage('alertes',document.querySelector('[onclick*=alertes]'))">Voir toutes les alertes</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALTERNANTS -->
+      <div id="page-alternants" class="page">
+        <div class="section">
+          <div class="section-head">
+            <h3>Liste des alternants</h3>
+            <div class="filters">
+              <select id="filter-promo" onchange="filterTable()">
+                <option value="">Toutes promos</option>
+                <option value="2024">Promo 2024</option>
+                <option value="2025">Promo 2025</option>
+                <option value="2026">Promo 2026</option>
+              </select>
+              <select id="filter-statut" onchange="filterTable()">
+                <option value="">Tous statuts</option>
+                <option value="Accordé">Accordé</option>
+                <option value="Rupture">Rupture</option>
+                <option value="Montage">Montage</option>
+              </select>
+            </div>
+          </div>
+          <table class="table" id="alt-table">
+            <thead>
+              <tr>
+                <th>Alternant</th>
+                <th>Site</th>
+                <th>Poste</th>
+                <th>École</th>
+                <th>Promo</th>
+                <th>Contrat</th>
+                <th>Statut</th>
+                <th>Fiche</th>
+              </tr>
+            </thead>
+            <tbody id="alt-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FINANCES -->
+      <div id="page-finances" class="page">
+        <div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+          <div class="metric">
+            <div class="metric-label">Coût total formation</div>
+            <div class="metric-value">70 619 €</div>
+            <div class="metric-sub">7 alternants</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Prise en charge OPCO</div>
+            <div class="metric-value green">53 305 €</div>
+            <div class="metric-sub">75,5% couvert</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Reste à charge net</div>
+            <div class="metric-value amber">17 314 €</div>
+            <div class="metric-sub">Après négociations</div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="tabs">
+            <div class="tab active" onclick="showTab('opco',this)">OPCO — Formation</div>
+            <div class="tab" onclick="showTab('sylae',this)">SYLAE — Aides État</div>
+          </div>
+
+          <div id="tab-opco" style="padding:0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Alternant</th>
+                  <th>École</th>
+                  <th>Coût formation</th>
+                  <th>Prise en charge</th>
+                  <th>Reste à charge</th>
+                  <th>Négociation</th>
+                  <th>Reste réel</th>
+                  <th>Montant réglé</th>
+                  <th>Solde</th>
+                  <th>N° OPCO</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#E6F1FB;color:#185FA5">AZ</div>aa zz</div></td><td>Univ. Lyon 2</td><td>8 161 €</td><td>8 161 €</td><td>0 €</td><td>—</td><td>0 €</td><td>—</td><td><span class="badge badge-green">0 €</span></td><td>252136529</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#FAEEDA;color:#854F0B">ER</div>ee rr</div></td><td>INSEEC</td><td>23 950 €</td><td>6 896 €</td><td>17 054 €</td><td>4 410 €</td><td>4 410 €</td><td>—</td><td><span class="badge badge-red">4 410 €</span></td><td>252017003</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#EAF3DE;color:#3B6D11">RT</div>rr tt</div></td><td>ESDES</td><td>9 160 €</td><td>8 583 €</td><td>577 €</td><td>500 €</td><td>500 €</td><td>500 €</td><td><span class="badge badge-green">0 €</span></td><td>242172644</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#FAECE7;color:#993C1D">UY</div>uu yy</div></td><td>ECOFAC</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-gray">En attente</span></td><td>—</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#E6F1FB;color:#185FA5">IO</div>ii oo</div></td><td>CFAIM</td><td>11 348 €</td><td>6 415 €</td><td>4 933 €</td><td>0 €</td><td>0 €</td><td>—</td><td><span class="badge badge-green">0 €</span></td><td>252144865</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#EEEDFE;color:#534AB7">VU</div>vv uu</div></td><td>MyDigitalSchool</td><td>18 000 €</td><td>17 250 €</td><td>750 €</td><td>—</td><td>750 €</td><td>—</td><td><span class="badge badge-amber">750 €</span></td><td>252229358</td></tr>
+                <tr><td><div class="row-name"><div class="avatar" style="background:#EAF3DE;color:#3B6D11">FB</div>ff bb</div></td><td>ECOFAC</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-gray">En attente</span></td><td>—</td></tr>
+                <tr style="background:var(--color-background-secondary)">
+                  <td colspan="2" style="font-weight:500;font-size:12px">TOTAL</td>
+                  <td style="font-weight:500">70 619 €</td>
+                  <td style="font-weight:500;color:#3B6D11">47 305 €</td>
+                  <td style="font-weight:500">23 314 €</td>
+                  <td style="font-weight:500">4 910 €</td>
+                  <td style="font-weight:500">5 660 €</td>
+                  <td style="font-weight:500">500 €</td>
+                  <td style="font-weight:500;color:#A32D2D">5 160 €</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="tab-sylae" style="display:none;padding:0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Alternant</th>
+                  <th>Site</th>
+                  <th>Promo</th>
+                  <th>Aides à percevoir</th>
+                  <th>Aides perçues</th>
+                  <th>Restant à percevoir</th>
+                  <th>Avancement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#E6F1FB;color:#185FA5">AZ</div>aa zz</div></td>
+                  <td>CE Lyon</td><td>2025</td><td>6 000 €</td><td>3 333 €</td>
+                  <td><span class="badge badge-amber">2 667 €</span></td>
+                  <td><div class="progress-wrap"><div class="progress"><div class="progress-bar" style="width:56%"></div></div><span style="font-size:11px;color:var(--color-text-secondary)">56%</span></div></td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#FAEEDA;color:#854F0B">ER</div>ee rr</div></td>
+                  <td>GIF Paris</td><td>2024</td><td>6 000 €</td><td>6 000 €</td>
+                  <td><span class="badge badge-green">0 €</span></td>
+                  <td><div class="progress-wrap"><div class="progress"><div class="progress-bar" style="width:100%"></div></div><span style="font-size:11px;color:var(--color-text-secondary)">100%</span></div></td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#EAF3DE;color:#3B6D11">RT</div>rr tt</div></td>
+                  <td>CE Lyon</td><td>2024</td><td>6 000 €</td><td>6 000 €</td>
+                  <td><span class="badge badge-green">0 €</span></td>
+                  <td><div class="progress-wrap"><div class="progress"><div class="progress-bar" style="width:100%"></div></div><span style="font-size:11px;color:var(--color-text-secondary)">100%</span></div></td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#FAECE7;color:#993C1D">UY</div>uu yy</div></td>
+                  <td>FOZ Rennes</td><td>2026</td><td>—</td><td>—</td>
+                  <td><span class="badge badge-gray">Non renseigné</span></td>
+                  <td>—</td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#E6F1FB;color:#185FA5">IO</div>ii oo</div></td>
+                  <td>GIF Marseille</td><td>2025</td><td>5 000 €</td><td>833 €</td>
+                  <td><span class="badge badge-red">4 167 €</span></td>
+                  <td><div class="progress-wrap"><div class="progress"><div class="progress-bar" style="width:17%;background:#E24B4A"></div></div><span style="font-size:11px;color:var(--color-text-secondary)">17%</span></div></td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#EEEDFE;color:#534AB7">VU</div>vv uu</div></td>
+                  <td>CE Paris</td><td>2025</td><td>5 000 €</td><td>2 500 €</td>
+                  <td><span class="badge badge-amber">2 500 €</span></td>
+                  <td><div class="progress-wrap"><div class="progress"><div class="progress-bar" style="width:50%"></div></div><span style="font-size:11px;color:var(--color-text-secondary)">50%</span></div></td>
+                </tr>
+                <tr>
+                  <td><div class="row-name"><div class="avatar" style="background:#EAF3DE;color:#3B6D11">FB</div>ff bb</div></td>
+                  <td>CE Rennes</td><td>2026</td><td>—</td><td>—</td>
+                  <td><span class="badge badge-gray">Non renseigné</span></td>
+                  <td>—</td>
+                </tr>
+                <tr style="background:var(--color-background-secondary)">
+                  <td colspan="3" style="font-weight:500;font-size:12px">TOTAL</td>
+                  <td style="font-weight:500">22 000 €</td>
+                  <td style="font-weight:500;color:#3B6D11">18 666 €</td>
+                  <td style="font-weight:500;color:#A32D2D">9 334 €</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALERTES -->
+      <div id="page-alertes" class="page">
+        <div class="section">
+          <div class="section-head"><h3>Alertes & actions requises</h3></div>
+          <div style="padding:12px 16px;display:flex;flex-direction:column;gap:6px">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--color-text-secondary);margin:4px 0 6px">Critique</div>
+            <div class="alert-row" style="border:0.5px solid var(--color-border-danger)">
+              <div class="alert-dot dot-red"></div>
+              <div style="flex:1">
+                <div class="alert-text" style="font-weight:500">CERFA non signé — uu yy (FOZ Rennes)</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Contrat démarrage sept. 2026 · ECOFAC · Promo 2026</div>
+              </div>
+              <button class="btn" style="font-size:11px" onclick="sendPrompt('Que doit-on faire si le CERFA n\\'est pas signé avant le début du contrat d\\'apprentissage ?') ">Action ↗</button>
+            </div>
+            <div class="alert-row" style="border:0.5px solid var(--color-border-danger)">
+              <div class="alert-dot dot-red"></div>
+              <div style="flex:1">
+                <div class="alert-text" style="font-weight:500">Convention non signée — ff bb (CE Rennes)</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Désaccord école sur rémunération & date de début · ECOFAC · Promo 2026</div>
+              </div>
+              <button class="btn" style="font-size:11px" onclick="sendPrompt('Comment gérer un désaccord avec une école CFA sur la rémunération d\\'un alternant avant la signature de la convention ?')">Action ↗</button>
+            </div>
+
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--color-text-secondary);margin:8px 0 6px">SYLAE — Aides à relancer</div>
+            <div class="alert-row">
+              <div class="alert-dot dot-amber"></div>
+              <div style="flex:1">
+                <div class="alert-text">ii oo (GIF Marseille) — 4 167 € restants sur 5 000 €</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">Seulement 17% perçus · Rupture anticipée jan. 2026</div>
+              </div>
+              <span class="badge badge-red">Urgent</span>
+            </div>
+            <div class="alert-row">
+              <div class="alert-dot dot-amber"></div>
+              <div style="flex:1">
+                <div class="alert-text">aa zz (CE Lyon) — 2 667 € restants sur 6 000 €</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">56% perçus · Contrat en cours jusqu'en sept. 2026</div>
+              </div>
+              <span class="badge badge-amber">À suivre</span>
+            </div>
+            <div class="alert-row">
+              <div class="alert-dot dot-amber"></div>
+              <div style="flex:1">
+                <div class="alert-text">vv uu (CE Paris) — 2 500 € restants sur 5 000 €</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">50% perçus · Contrat en cours jusqu'en oct. 2027</div>
+              </div>
+              <span class="badge badge-amber">À suivre</span>
+            </div>
+
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--color-text-secondary);margin:8px 0 6px">OPCO — Facturation</div>
+            <div class="alert-row">
+              <div class="alert-dot dot-amber"></div>
+              <div style="flex:1">
+                <div class="alert-text">vv uu (CE Paris) — 750 € de reste à charge non réglé</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">MyDigitalSchool · Statut : accordé</div>
+              </div>
+              <span class="badge badge-amber">En attente</span>
+            </div>
+            <div class="alert-row">
+              <div class="alert-dot dot-amber"></div>
+              <div style="flex:1">
+                <div class="alert-text">ee rr (GIF Paris) — 4 410 € non réglés</div>
+                <div style="font-size:11px;color:var(--color-text-secondary);margin-top:2px">INSEEC · Rupture anticipée août 2025</div>
+              </div>
+              <span class="badge badge-red">Urgent</span>
+            </div>
+
+            <div style="margin-top:8px;padding:10px 12px;background:var(--color-background-info);border-radius:var(--border-radius-md)">
+              <div style="font-size:12px;color:var(--color-text-info)"><i class="ti ti-info-circle" style="font-size:14px;vertical-align:-2px;margin-right:4px" aria-hidden="true"></i> 2 alternants en montage de contrat (promo 2026) : devis et infos entreprises manquants côté écoles.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const alternants = [
+  {nom:'aa zz',initiales:'AZ',couleur:'#E6F1FB',textc:'#185FA5',site:'CE Lyon',poste:'Juriste',ecole:'Univ. Lyon 2',promo:'2025',debut:'09/2025',fin:'09/2026',statut:'Accordé'},
+  {nom:'ee rr',initiales:'ER',couleur:'#FAEEDA',textc:'#854F0B',site:'GIF Paris',poste:'SDR',ecole:'INSEEC',promo:'2024',debut:'09/2024',fin:'09/2026',statut:'Rupture'},
+  {nom:'rr tt',initiales:'RT',couleur:'#EAF3DE',textc:'#3B6D11',site:'CE Lyon',poste:'Assistante admin.',ecole:'ESDES',promo:'2024',debut:'09/2024',fin:'09/2025',statut:'Rupture'},
+  {nom:'uu yy',initiales:'UY',couleur:'#FAECE7',textc:'#993C1D',site:'FOZ Rennes',poste:'SDR',ecole:'ECOFAC',promo:'2026',debut:'09/2026',fin:'09/2027',statut:'Montage'},
+  {nom:'ii oo',initiales:'IO',couleur:'#E6F1FB',textc:'#185FA5',site:'GIF Marseille',poste:'SDR',ecole:'CFAIM',promo:'2025',debut:'09/2025',fin:'06/2026',statut:'Rupture'},
+  {nom:'vv uu',initiales:'VU',couleur:'#EEEDFE',textc:'#534AB7',site:'CE Paris',poste:'Product Designer',ecole:'MyDigitalSchool',promo:'2025',debut:'11/2025',fin:'10/2027',statut:'Accordé'},
+  {nom:'ff bb',initiales:'FB',couleur:'#EAF3DE',textc:'#3B6D11',site:'CE Rennes',poste:'SDR',ecole:'ECOFAC',promo:'2026',debut:'09/2026',fin:'09/2027',statut:'Montage'},
+];
+
+function badgeClass(s){return s==='Accordé'?'badge-blue':s==='Rupture'?'badge-red':'badge-amber'}
+
+function renderTable(data){
+  const tbody=document.getElementById('alt-body');
+  tbody.innerHTML=data.map(a=>`<tr>
+    <td><div class="row-name"><div class="avatar" style="background:${a.couleur};color:${a.textc}">${a.initiales}</div>${a.nom}</div></td>
+    <td>${a.site}</td><td>${a.poste}</td><td style="font-size:11px">${a.ecole}</td><td>${a.promo}</td>
+    <td style="font-size:11px;white-space:nowrap">${a.debut} → ${a.fin}</td>
+    <td><span class="badge ${badgeClass(a.statut)}">${a.statut}</span></td>
+    <td><button class="btn" style="font-size:11px;padding:4px 8px" onclick="sendPrompt('Montre-moi la fiche complète de ${a.nom} avec tous les détails de son contrat, sa rémunération et ses aides.')">Voir ↗</button></td>
+  </tr>`).join('');
+}
+
+function filterTable(){
+  const promo=document.getElementById('filter-promo').value;
+  const statut=document.getElementById('filter-statut').value;
+  let data=alternants;
+  if(promo) data=data.filter(a=>a.promo===promo);
+  if(statut) data=data.filter(a=>a.statut.toLowerCase().includes(statut.toLowerCase().split(' ')[0]));
+  renderTable(data);
+}
+
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  const titles={dashboard:'Tableau de bord',alternants:'Liste des alternants',finances:'Suivi financier',alertes:'Alertes & actions'};
+  document.getElementById('page-title').textContent=titles[id];
+  if(id==='alternants') renderTable(alternants);
+}
+
+function showTab(id,el){
+  document.getElementById('tab-opco').style.display='none';
+  document.getElementById('tab-sylae').style.display='none';
+  document.getElementById('tab-'+id).style.display='block';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+renderTable(alternants);
+</script>
